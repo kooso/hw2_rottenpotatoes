@@ -11,13 +11,21 @@ class MoviesController < ApplicationController
     @sort_by = params[:sort_by]
     set_rating_filters
     @movies = Movie.
-                where('rating IN (:ratings)', :ratings => @ratingFilters).
-                order(@sort_by)
+                where('rating IN (:ratings)', :ratings => @ratingFilters).order(@sort_by)
   end
 
   def set_rating_filters
     @all_ratings = Movie.all_ratings
-    @ratingFilters = params[:ratings] != nil ? params[:ratings].keys : @all_ratings
+    if params[:ratings] != nil
+      @ratingFilters = params[:ratings]
+      if @ratingFilters.is_a? Hash
+        @ratingFilters = @ratingFilters.keys
+      end
+    else
+      @ratingFilters = @all_ratings
+    end
+    # @ratingFilters =  ? params[:ratings].keys : @all_ratings
+    # @ratingFilters = params[:ratings]
   end
 
   def new
