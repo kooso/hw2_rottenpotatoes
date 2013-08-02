@@ -7,25 +7,36 @@ class MoviesController < ApplicationController
   end
 
   def index
-    @params = params
-    @sort_by = params[:sort_by]
+    set_sort_by
     set_rating_filters
     @movies = Movie.
                 where('rating IN (:ratings)', :ratings => @ratingFilters).order(@sort_by)
   end
 
+  def set_sort_by
+    if params[:sort_by] != nil
+      @sort_by = params[:sort_by]
+    else 
+      @sort_by = session[:sort_by]
+    end
+    session[:sort_by] = @sort_by
+  end
+
   def set_rating_filters
     @all_ratings = Movie.all_ratings
+
     if params[:ratings] != nil
       @ratingFilters = params[:ratings]
       if @ratingFilters.is_a? Hash
         @ratingFilters = @ratingFilters.keys
       end
+    elsif session[:ratingFilters] != nil
+      @ratingFilters = session[:ratingFilters]
     else
       @ratingFilters = @all_ratings
     end
-    # @ratingFilters =  ? params[:ratings].keys : @all_ratings
-    # @ratingFilters = params[:ratings]
+    
+    session[:ratingFilters] = @ratingFilters
   end
 
   def new
